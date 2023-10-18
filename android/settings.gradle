@@ -3,6 +3,8 @@ apply from: file("../node_modules/@react-native-community/cli-platform-android/n
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
+// Only needed when building react-native from sources
+// see: https://github.com/react-native-tvos/react-native-tvos/issues/574#issuecomment-1732396965
 includeBuild('../node_modules/react-native') {
   dependencySubstitution {
     substitute(module("io.github.react-native-tvos:react-android")).using(project(":packages:react-native:ReactAndroid"))

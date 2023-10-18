@@ -1,0 +1,18 @@
+diff --git a/node_modules/react-native/ReactAndroid/hermes-engine/build.gradle b/node_modules/react-native/ReactAndroid/hermes-engine/build.gradle
+index 25ff8eb..237fc5b 100644
+--- a/node_modules/react-native/ReactAndroid/hermes-engine/build.gradle
++++ b/node_modules/react-native/ReactAndroid/hermes-engine/build.gradle
+@@ -47,7 +47,12 @@ def hermesDir = System.getenv("REACT_NATIVE_OVERRIDE_HERMES_DIR") ?: new File(re
+ def hermesBuildDir = new File("$buildDir/hermes")
+ 
+ def hermesVersion = "main"
+-def hermesVersionFile = new File(reactNativeRootDir, "../../node_modules/react-native-core/sdks/.hermesversion")
++/**
++ * Necessary to build from sources:
++ * 1) Change the following line to use the correct path
++ * 2) Add official react-native repo as "react-native-core" to the project
++ */
++def hermesVersionFile = new File(reactNativeRootDir, "../react-native-core/sdks/.hermesversion")
+ if (hermesVersionFile.exists()) {
+     hermesVersion = hermesVersionFile.text
+ }

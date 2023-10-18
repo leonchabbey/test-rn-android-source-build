@@ -44,7 +44,11 @@ react {
 
     /* Hermes Commands */
     //   The hermes compiler command to run. By default it is 'hermesc'
-    // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
+
+    // Only needed when building react-native from sources AND bundling the app in release mode
+    // see: https://github.com/react-native-tvos/react-native-tvos/issues/574#issuecomment-1732396965
+    hermesCommand = "node_modules/react-native-core/sdks/hermesc/%OS-BIN%/hermesc"
+
     //
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     // hermesFlags = ["-O", "-output-source-map"]
@@ -101,6 +105,60 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    // Only needed when building react-native from sources
+    // see: https://github.com/react-native-tvos/react-native-tvos/issues/574#issuecomment-1732396965
+    packagingOptions {
+        pickFirst "**/libc++_shared.so"
+        pickFirst "**/libfabricjni.so"
+        pickFirst "**/libfb.so"
+        pickFirst "**/libfolly_runtime.so"
+        pickFirst "**/libglog.so"
+        pickFirst "**/libglog_init.so"
+        pickFirst "**/libhermes_executor.so"
+        pickFirst "**/libjscexecutor.so"
+        pickFirst "**/libjsi.so"
+        pickFirst "**/libjsijniprofiler.so"
+        pickFirst "**/libjsinspector.so"
+        pickFirst "**/liblogger.so"
+        pickFirst "**/libmapbufferjni.so"
+        pickFirst "**/libreact_codegen_rncore.so"
+        pickFirst "**/libreact_config.so"
+        pickFirst "**/libreact_debug.so"
+        pickFirst "**/libreact_nativemodule_core.so"
+        pickFirst "**/libreact_newarchdefaults.so"
+        pickFirst "**/libreact_render_animations.so"
+        pickFirst "**/libreact_render_attributedstring.so"
+        pickFirst "**/libreact_render_componentregistry.so"
+        pickFirst "**/libreact_render_core.so"
+        pickFirst "**/libreact_render_debug.so"
+        pickFirst "**/libreact_render_element.so"
+        pickFirst "**/libreact_render_graphics.so"
+        pickFirst "**/libreact_render_imagemanager.so"
+        pickFirst "**/libreact_render_leakchecker.so"
+        pickFirst "**/libreact_render_mapbuffer.so"
+        pickFirst "**/libreact_render_mounting.so"
+        pickFirst "**/libreact_render_runtimescheduler.so"
+        pickFirst "**/libreact_render_scheduler.so"
+        pickFirst "**/libreact_render_telemetry.so"
+        pickFirst "**/libreact_render_templateprocessor.so"
+        pickFirst "**/libreact_render_textlayoutmanager.so"
+        pickFirst "**/libreact_render_uimanager.so"
+        pickFirst "**/libreact_utils.so"
+        pickFirst "**/libreactnativeblob.so"
+        pickFirst "**/libreactnativejni.so"
+        pickFirst "**/libreactperfloggerjni.so"
+        pickFirst "**/librrc_image.so"
+        pickFirst "**/librrc_legacyviewmanagerinterop.so"
+        pickFirst "**/librrc_root.so"
+        pickFirst "**/librrc_scrollview.so"
+        pickFirst "**/librrc_text.so"
+        pickFirst "**/librrc_textinput.so"
+        pickFirst "**/librrc_unimplementedview.so"
+        pickFirst "**/librrc_view.so"
+        pickFirst "**/libruntimeexecutor.so"
+        pickFirst "**/libturbomodulejsijni.so"
+        pickFirst "**/libyoga.so"
+    }
 }
 
 dependencies {
@@ -110,19 +168,30 @@ dependencies {
     // in gradle.properties for now
     // We also use the io.github.react-native-tvos group for the react-android and hermes-android dependencies
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 1. When building from source and needing to debug the native code (breakpoints, ...), use the following:
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     implementation("io.github.react-native-tvos:react-android")
-
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
     }
-
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
     if (hermesEnabled.toBoolean()) {
         implementation("io.github.react-native-tvos:hermes-android")
     } else {
         implementation jscFlavor
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 2. When building from source and bundling the app in release mode, use the following:
+    // (It basically removes dependencies to pre-built react-native that are causing merge DEX duplicate files issues)
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
+    // debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
+    //     exclude group:'com.squareup.okhttp3', module:'okhttp'
+    // }
+    // debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
